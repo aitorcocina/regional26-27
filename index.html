@@ -65,6 +65,7 @@ nav.tabbar svg{width:24px;height:24px}nav.tabbar .on{color:var(--acc)}
 /* splash */
 #splash{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 45%,#E0262D,#C8191F 45%,#8E0F14 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity .5s ease,transform .5s ease,visibility .5s}
 #splash.off{opacity:0;transform:scale(1.12);visibility:hidden}
+#splash:not(.go) #um path,#splash:not(.go) #um g,#splash:not(.go) #onda{animation-play-state:paused}
 #um{width:min(64vw,300px);height:auto;overflow:visible;filter:drop-shadow(0 8px 20px rgba(0,0,0,.35))}
 #um path{fill:#fff;transform-box:fill-box;transform-origin:center}
 #um .u{animation:uIn 1.15s cubic-bezier(.16,.9,.3,1.08) both}
@@ -109,10 +110,13 @@ var MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'
 function fecha(d,h){if(!d)return'Fecha por confirmar';var p=d.split('-'),x=new Date(+p[0],p[1]-1,+p[2]);return DIA[x.getDay()]+' '+x.getDate()+' '+MES[x.getMonth()]+(h?' · '+h:'')}
 
 /* ---------- splash ---------- */
-(function(){var sp=document.getElementById('splash');if(!sp)return;
-  function fuera(){sp.classList.add('off');setTimeout(function(){sp.remove()},600)}
-  var t=setTimeout(fuera,2900);
-  sp.addEventListener('click',function(){clearTimeout(t);fuera()});
+(function(){var sp=document.getElementById('splash');if(!sp)return;var t,hecho=false;
+  function fuera(){clearTimeout(t);sp.classList.add('off');setTimeout(function(){sp.remove()},600)}
+  function go(){if(hecho||document.prerendering||document.visibilityState==='hidden')return;hecho=true;
+    requestAnimationFrame(function(){requestAnimationFrame(function(){sp.classList.add('go');t=setTimeout(fuera,2900)})})}
+  document.addEventListener('visibilitychange',go);document.addEventListener('prerenderingchange',go);
+  window.addEventListener('pageshow',go);go();
+  sp.addEventListener('click',fuera);
 })();
 
 /* ---------- datos ---------- */
